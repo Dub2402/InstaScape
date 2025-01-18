@@ -1,27 +1,24 @@
-from dublib.Methods.JSON import ReadJSON
+from dublib.Methods.Filesystem import ReadJSON, MakeRootDirectories
 from Source.Browser import Browser
-from netscape_cookies import save_cookies_to_file
 from netscape_cookies import to_netscape_string
-from datetime import datetime
-import os
+from dublib.Methods.Filesystem import WriteTextFile
 
+import os
 
 Settings = ReadJSON("Settings.json")
 
 browser = Browser()
-
 cookies = browser.authorization(Settings["login"], Settings["password"])
 
-now = datetime.now()
+file_path = Settings["path"]
 
-try:
-    for file in os.listdir("Cookies"):
-        if file.endswith(".txt"):
-            os.remove(f"Cookies/{file}")
-except: pass
+try: 
+    if not os.path.exists(file_path) and '/' in file_path:
+        folder = '/'.join(file_path.split("/")[:-1])
+        MakeRootDirectories([folder])
+except: print("Неправильно задан путь к папку cookies")                             
 
-file_path = f"Cookies/{now}_cookies.txt"
+NetStr = to_netscape_string(cookies)
+NetStr = "# Netscape HTTP Cookie File\n" + NetStr
 
-save_cookies_to_file(cookies, file_path)
-
-to_netscape_string(cookies)
+WriteTextFile(file_path, NetStr)

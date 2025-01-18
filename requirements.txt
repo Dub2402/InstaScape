@@ -1,3 +1,4 @@
 selenium
-dublib
+dublib == 0.16.0
 netscape-cookies
+selenium-authenticated-proxy
